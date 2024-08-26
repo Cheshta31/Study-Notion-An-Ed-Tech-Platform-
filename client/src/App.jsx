@@ -37,6 +37,8 @@ const InstructorDashboard = lazy(() =>
 
 function App() {
   const { user } = useSelector((state) => state.profile);
+  console.log("User is");
+  console.log(user);
   return (
     <>
       <Routes>

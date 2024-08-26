@@ -2,7 +2,7 @@ const { BadRequestError } = require("../errors");
 const mailSender = require("../utils/mailSender");
 
 //get data from contact us form and send an email user  and an email to yourself
-const myEmailId = "niteshjain1002@gmail.com";
+const myEmailId = "cheshtakhurana31@gmail.com";
 exports.contactUs = async (req, res) => {
   //get data
   const { firstName, lastName, email, contactNumber, message } = req.body;

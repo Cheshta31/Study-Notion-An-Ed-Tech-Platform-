@@ -8,88 +8,108 @@ const SubSection = require("../models/SubSection");
 const CourseProgress = require("../models/CourseProgress");
 const formatDuration = require("../utils/FormatDuration");
 
-//create Course
+// create Course
 exports.createCourse = async (req, res) => {
-  //fetch data
-  const userId = req.user.id;
-  const {
-    courseName,
-    courseDescription,
-    whatYouWillLearn,
-    price,
-    tag,
-    category,
-    status,
-    instructions,
-  } = req.body;
-  //get thumbnail
-  const thumbnail = req.files?.thumbnail;
-  console.log(thumbnail);
-  //validation
-  if (
-    !courseName ||
-    !courseDescription ||
-    !whatYouWillLearn ||
-    !price ||
-    !tag ||
-    !category
-  )
-    throw new BadRequestError("All fields are required");
+  try {
+    // Fetch data from request
+    const userId = req.user.id;
+    console.log(req.user.id);
 
-  //check for instructor(already performed in middleware but we need instructor object id to save in course)
+    const {
+      courseName,
+      courseDescription,
+      whatYouWillLearn,
+      price,
+      tag,
+      category,
+      status,
+      instructions,
+    } = req.body;
+    console.log(req.body);
 
-  const instructorDetails = await User.findById(userId);
-  if (!instructorDetails) throw new NotFoundError("Instructor not found");
+    // Get thumbnail from request files
+    const thumbnail = req.files?.thumbnail;
+    console.log(thumbnail);
 
-  //check given category is valid or not
-  const categoryDetails = await Category.findById(category);
-  if (!categoryDetails) throw new NotFoundError("Category not found");
-  // console.log(categoryDetails);
-  //upload image to cloudinary
-  let UploadImage = "";
-  if (thumbnail)
-    UploadImage = await uploadImageToCloudinary(
-      thumbnail,
-      process.env.FOLDER_NAME
+    // Validation checks
+    if (!courseName) throw new BadRequestError("Course name is required");
+    if (!courseDescription) throw new BadRequestError("Course description is required");
+    if (!whatYouWillLearn) throw new BadRequestError("What you will learn is required");
+    if (!price) throw new BadRequestError("Price is required");
+    if (!tag) throw new BadRequestError("Tag is required");
+    if (!category) throw new BadRequestError("Category is required");
+
+    // Check for instructor details (already performed in middleware but needed here for reference)
+    const instructorDetails = await User.findById(userId);
+    if (!instructorDetails) throw new NotFoundError("Instructor not found");
+    console.log("Instructor details fetched successfully");
+
+    // Check if the given category is valid
+    const categoryDetails = await Category.findById(category);
+    if (!categoryDetails) throw new NotFoundError("Category not found");
+    console.log(categoryDetails);
+
+    // Upload image to Cloudinary if thumbnail is provided
+    let uploadImage = "";
+    if (thumbnail) {
+      console.log("Uploading image to Cloudinary...");
+      uploadImage = await uploadImageToCloudinary(thumbnail, process.env.FOLDER_NAME);
+    }
+
+    // Safely parse `tag` and `instructions` to ensure they are arrays
+    const parsedTag = typeof tag === 'string' ? JSON.parse(tag) : Array.isArray(tag) ? tag : [];
+    const parsedInstructions = typeof instructions === 'string' ? JSON.parse(instructions) : Array.isArray(instructions) ? instructions : [];
+
+    // Create a new course entry in the database
+    const newCourse = await Course.create({
+      courseName,
+      courseDescription,
+      instructor: instructorDetails._id,
+      whatYouWillLearn,
+      price,
+      tag: parsedTag,
+      category: categoryDetails._id,
+      thumbnail: uploadImage?.secure_url,
+      status,
+      instructions: parsedInstructions,
+    });
+    console.log("New entry created for course");
+
+    // Add the new course to the instructor's list of courses
+    await User.findByIdAndUpdate(
+      instructorDetails._id,
+      {
+        $push: { courses: newCourse._id },
+      },
+      { new: true }
     );
 
-  //create an entry for new course
-  const newCourse = await Course.create({
-    courseName,
-    courseDescription,
-    instructor: instructorDetails._id,
-    whatYouWillLearn,
-    price,
-    tag: JSON.parse(tag),
-    category: categoryDetails._id,
-    thumbnail: UploadImage?.secure_url,
-    status,
-    instructions: JSON.parse(instructions),
-  });
-  //add the new course to the userSchema of instructor  //can also add this using already fetch instructorDetails
-  await User.findByIdAndUpdate(
-    instructorDetails._id,
-    {
-      $push: { courses: newCourse._id },
-    },
-    { new: true }
-  );
+    // Update the category schema with the new course
+    await Category.findByIdAndUpdate(
+      category,
+      {
+        $push: { courses: newCourse._id },
+      },
+      { new: true }
+    );
 
-  //Update the category schema //can also try to add this using already fetch categoryDetails
-  await Category.findByIdAndUpdate(
-    category,
-    {
-      $push: { courses: newCourse._id },
-    },
-    { new: true }
-  );
+    // Send success response
+    return res.status(201).json({
+      success: true,
+      message: "Course created successfully",
+      data: newCourse,
+    });
 
-  return res.status(201).json({
-    success: true,
-    message: "Course created successfully",
-    data: newCourse,
-  });
+  } catch (error) {
+    // Log the error and send an error response
+    console.error("Error creating course:", error.message);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Error creating course",
+    });
+  }
 };
+
 
 //getAllCourses
 exports.getAllCourses = async (req, res) => {

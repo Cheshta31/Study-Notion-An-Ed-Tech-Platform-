@@ -1,8 +1,10 @@
 import React from "react";
 import { BiChevronLeft } from "react-icons/bi";
 import CoursesTable from "./CoursesTable";
+import { useNavigate } from "react-router-dom";
 
 function MyCourses() {
+  const navigate = useNavigate();
   return (
     <>
       <button
