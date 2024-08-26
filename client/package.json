@@ -2,7 +2,7 @@
   "name": "studynotion",
   "private": true,
   "version": "0.0.0",
-  "proxy": "https://studynotionanedtechplatform.onrender.com",
+  "proxy": "https://studynotionbackend-lkfo.onrender.com/",
   "type": "module",
   "scripts": {
     "dev": "vite --port 3000",
