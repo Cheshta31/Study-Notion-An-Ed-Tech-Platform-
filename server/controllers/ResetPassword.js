@@ -18,7 +18,7 @@ exports.resetPasswordToken = async (req, res) => {
   await user.save();
   //create url
   //TODO: frontend url
-  const url = `localhost:3000/update-password/${token}`;
+  const url = `https://study-notion-an-ed-tech-platform-frontend/update-password/${token}/.onrender.com/`;
   //send mail containing the url
   await mailSender(
     email,
