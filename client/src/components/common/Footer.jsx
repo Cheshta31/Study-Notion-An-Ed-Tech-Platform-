@@ -127,7 +127,7 @@ function Footer() {
               </Link>
             ))}
           </div>
-          <p className="text-sm font-normal">Made with ❤️ Nishant</p>
+          <p className="text-sm font-normal">Made with ❤️ Cheshta</p>
         </div>
       </div>
     </footer>
