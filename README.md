@@ -1,8 +1,7 @@
 # Studynotion
 
-<p>Live Site -> https://cheshta-study-notion.netlify.app/ <p>
-<p>Backend is deployed at -> https://studynotionbackend-lkfo.onrender.com/
-  https://studynotionbackend-4rc2.onrender.com </p>
+<p>Live Site -> https://cheshta-study-notion.netlify.app/ </p>
+<p>Backend is deployed at -> https://studynotionbackend-lkfo.onrender.com </p>
 <p>StudyNotion is a fully functional ed-tech platform that enables users to create, consume, and rate educational content. The platform is built using the MERN stack, which includes ReactJS, NodeJS, MongoDB, and ExpressJS.</p>
 <p>The platform is built using the MERN stack, which includes ReactJS, NodeJS, MongoDB, and ExpressJS.</p>
 <p>This project contains a dynamic user interface for students and instructors using ReactJS, and built a secure back-end with NodeJS and ExpressJS, ensuring seamless user authentication, course management, and payment integration.</p>
